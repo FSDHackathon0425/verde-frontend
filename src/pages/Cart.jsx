@@ -1,11 +1,38 @@
-import { useCart } from "../context/CartContext"; 
+import { useCart } from '../context/CartContext';
+import { useEffect } from 'react';
 
 const Cart = () => {
-  const { cart, removeFromCart, updateQuantity, totalPrice } = useCart();
+  const {
+    cart,
+    removeFromCart,
+    updateQuantity,
+    submitOrder,
+    totalPrice,
+    totalItems,
+    isProcessing,
+    orderError,
+    clearCart
+  } = useCart();
+
+  const [userId] = useState('123'); // Reemplaza con tu sistema de autenticación
+
+  const handleSubmit = async () => {
+    const result = await submitOrder(userId);
+    if (result.success) {
+      // Opcional: Mostrar confirmación
+    }
+  };
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-4xl mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">Carrito de Compras</h1>
+      
+      {orderError && (
+        <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4">
+          {orderError}
+        </div>
+      )}
+
       {cart.length === 0 ? (
         <p className="text-gray-600">Tu carrito está vacío.</p>
       ) : (
@@ -21,9 +48,6 @@ const Cart = () => {
                   <div className="text-right">
                     <p className="text-green-600 font-bold">
                       {(item.price * item.quantity).toFixed(2)} €
-                    </p>
-                    <p className="text-sm text-gray-500">
-                      {item.price.toFixed(2)} € x {item.quantity}
                     </p>
                   </div>
                 </div>
@@ -58,8 +82,14 @@ const Cart = () => {
                 {totalPrice.toFixed(2)} €
               </p>
             </div>
-            <button className="mt-4 w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700">
-              Finalizar Pedido
+            <button
+              onClick={handleSubmit}
+              disabled={isProcessing}
+              className={`mt-4 w-full py-2 px-4 rounded text-white ${
+                isProcessing ? 'bg-gray-400' : 'bg-blue-600 hover:bg-blue-700'
+              }`}
+            >
+              {isProcessing ? 'Procesando...' : 'Finalizar Pedido'}
             </button>
           </div>
         </div>
